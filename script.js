@@ -6,7 +6,7 @@ const suggestionsList = document.getElementById("suggestions-list");
 
 let currentWeatherData = null;
 
-
+// Used help from GeeksforGeeks for creating the dropdown list. Link: https://www.geeksforgeeks.org/javascript/how-to-create-dropdown-list-using-javascript/
 // Function to fetch city suggestions based on user input
 city.addEventListener("input", async function (e) {
     e.preventDefault();
@@ -18,7 +18,7 @@ city.addEventListener("input", async function (e) {
         return;
     }
 
-    const searchUrl = `https://api.weatherapi.com/v1/search.json?key=${apiKey}&q=${encodeURIComponent(query)}`;
+    const searchUrl = `https://api.weatherapi.com/v1/search.json?key=${apiKey}&q=${query}`;
 
     try {
         const res = await fetch(searchUrl);
