@@ -6,7 +6,9 @@ const suggestionsList = document.getElementById("suggestions-list");
 
 let currentWeatherData = null;
 
-city.addEventListener("input", async function(e) {
+
+// Function to fetch city suggestions based on user input
+city.addEventListener("input", async function (e) {
     e.preventDefault();
     const query = city.value.trim();
 
@@ -29,9 +31,9 @@ city.addEventListener("input", async function(e) {
             locations.forEach(loc => {
                 const li = document.createElement("li");
                 li.textContent = `${loc.name}, ${loc.country}`;
-                
+
                 // When a suggestion is clicked, fill the input and fetch weather
-                li.addEventListener("click", function() {
+                li.addEventListener("click", function () {
                     city.value = loc.name;
                     suggestionsList.innerHTML = "";
                     suggestionsList.style.display = "none";
@@ -48,41 +50,44 @@ city.addEventListener("input", async function(e) {
     }
 });
 
-// Hide suggestion list if user clicks anywhere outside of it
-document.addEventListener("click", function(e) {
+// Hide suggestions when clicking outside the input or suggestions list
+document.addEventListener("click", function (e) {
     if (!city.contains(e.target) && !suggestionsList.contains(e.target)) {
         suggestionsList.style.display = "none";
     }
 });
 
+
+// Function to fetch weather data for a given city
 async function getWeather(city) {
+    const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=3`;
+    try {
+        const res = await fetch(url);
+        currentWeatherData = await res.json();
+        console.log(currentWeatherData);
 
-const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=3`;
-try {
-    const res = await fetch(url);
-    currentWeatherData = await res.json();
-    console.log(currentWeatherData);
-  
-    cityName = document.getElementById("city-name");
-    cityName.textContent = currentWeatherData.location.name;
+        cityName = document.getElementById("city-name");
+        cityName.textContent = currentWeatherData.location.name;
 
-    temperature = document.getElementById("temperature");
-    temperature.textContent = `Temperature: ${currentWeatherData.current.temp_c}°C`;
+        temperature = document.getElementById("temperature");
+        temperature.textContent = `Temperature: ${currentWeatherData.current.temp_c}°C`;
 
-    description = document.getElementById("description");
-    description.textContent = `Description: ${currentWeatherData.current.condition.text}`;
-    weatherIcon = document.getElementById("weather-icon");
-    weatherIcon.style.display = "block";
-    weatherIcon.src = currentWeatherData.current.condition.icon;
-    weatherIcon.alt = currentWeatherData.current.condition.text;
+        description = document.getElementById("description");
+        description.textContent = `Description: ${currentWeatherData.current.condition.text}`;
+        weatherIcon = document.getElementById("weather-icon");
+        weatherIcon.src = currentWeatherData.current.condition.icon;
+        weatherIcon.alt = currentWeatherData.current.condition.text;
 
-    windSpeed = document.getElementById("wind-speed");
-    windSpeed.textContent = `Wind speed: ${currentWeatherData.current.wind_kph} kph`;
-    forecastWeather();
-} catch (error) {
-    console.error("Error fetching weather data:", error);
-}}
+        windSpeed = document.getElementById("wind-speed");
+        windSpeed.textContent = `Wind speed: ${currentWeatherData.current.wind_kph} kph`;
+        forecastWeather();
+    } catch (error) {
+        console.error("Error fetching weather data:", error);
+    }
+}
 
+
+//Forecast weather function
 function forecastWeather() {
 
     // Display forecast for the next 3 days
@@ -90,7 +95,7 @@ function forecastWeather() {
     forecastDay1 = document.getElementById("forecast-date-1");
     forecastDay1.textContent = `${formatDate(currentWeatherData.forecast.forecastday[0].date)}`;
 
-// Day 1 temperature
+    // Day 1 temperature
     forecastTempDay1 = document.getElementById("forecast-temp-1");
     forecastTempDay1.textContent = `Temp: ${currentWeatherData.forecast.forecastday[0].day.avgtemp_c}°C`;
 
@@ -98,7 +103,6 @@ function forecastWeather() {
     forecastIconDay1 = document.getElementById("forecast-icon-1");
     forecastIconDay1.src = currentWeatherData.forecast.forecastday[0].day.condition.icon;
     forecastIconDay1.alt = currentWeatherData.forecast.forecastday[0].day.condition.text;
-    forecastIconDay1.style.display = "block";
 
     // Day 1 description
     forecastDescriptionDay1 = document.getElementById("forecast-desc-1");
@@ -121,10 +125,9 @@ function forecastWeather() {
     forecastIconDay2 = document.getElementById("forecast-icon-2");
     forecastIconDay2.src = currentWeatherData.forecast.forecastday[1].day.condition.icon;
     forecastIconDay2.alt = currentWeatherData.forecast.forecastday[1].day.condition.text;
-    forecastIconDay2.style.display = "block";
-    
+
     // Day 2 description
-   forecastDescriptionDay2 = document.getElementById("forecast-desc-2");
+    forecastDescriptionDay2 = document.getElementById("forecast-desc-2");
     forecastDescriptionDay2.textContent = `${currentWeatherData.forecast.forecastday[1].day.condition.text}`;
 
     // Day 2 wind speed
@@ -144,7 +147,6 @@ function forecastWeather() {
     forecastIconDay3 = document.getElementById("forecast-icon-3");
     forecastIconDay3.src = currentWeatherData.forecast.forecastday[2].day.condition.icon;
     forecastIconDay3.alt = currentWeatherData.forecast.forecastday[2].day.condition.text;
-    forecastIconDay3.style.display = "block";
 
     //Day 3 description
     forecastDescriptionDay3 = document.getElementById("forecast-desc-3");
@@ -155,8 +157,10 @@ function forecastWeather() {
     forecastWindDay3.textContent = `Wind speed: ${currentWeatherData.forecast.forecastday[2].day.maxwind_kph} kph`;
 }
 
+
+// Function to handle temperature unit change
 tempType.forEach((radio) => {
-    radio.addEventListener("change", function(e) {
+    radio.addEventListener("change", function (e) {
         e.preventDefault();
         if (e.target.value === "fahrenheit") {
             temperature = document.getElementById("temperature");
@@ -180,12 +184,14 @@ tempType.forEach((radio) => {
     });
 });
 
-
-document.getElementById("search-button").addEventListener("click", function(e){
+// Event listener for the search button
+document.getElementById("search-button").addEventListener("click", function (e) {
     e.preventDefault();
     getWeather(city.value);
 })
 
+
+// Function to format date
 function formatDate(dateString) {
     const date = new Date(dateString);
     const options = { weekday: 'long', month: 'long', day: 'numeric' };
